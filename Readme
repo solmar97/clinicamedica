@@ -18,10 +18,19 @@ https://github.com/solmar97/clinicamedica
 - Contraseña: 1234
 
 3. Ir a File > Open SQL Script... y seleccionar el archivo Dump20250608.sql descargado.
-4. Ejecutar el script completo con el botón Run o presionar `Ctrl + Shift + Enter`.
+
+4. Crear la base de datos 
+CREATE DATABASE clinicamedica;
+USE clinicamedica;
+
+
+5. Ejecutar el script completo con el botón Run o presionar `Ctrl + Shift + Enter`.
 Esto creará todas las tablas necesarias y poblará la base de datos con la información requerida.
 
-### 4. Abrir el proyecto en NetBeans
+6.  Hacer click en refresh al lado de Schemas 
+
+
+7. Abrir el proyecto en NetBeans
 
 1. Abrir NetBeans.
 2. Ir a `File > Open Project`.
@@ -30,4 +39,11 @@ Esto creará todas las tablas necesarias y poblará la base de datos con la info
 
 ### 5. Listo
 El sistema debería ejecutarse correctamente si los pasos fueron seguidos. Asegurate de tener corriendo tu servidor MySQL antes de ejecutar la aplicación.
+
+### SCOPE DEL PROYECTO
+Solamente está desarrollado los botones **Especialidad, Médico, Pacientes y Turnos**.
+
+## Para acceder / iniciar sesión
+Usuario: pablo
+Contraseña: 1234
 

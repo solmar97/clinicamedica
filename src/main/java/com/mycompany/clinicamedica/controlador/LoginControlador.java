@@ -8,6 +8,8 @@ import com.mycompany.clinicamedica.vista.MedicoVista;
 import com.mycompany.clinicamedica.vista.SecretarioVista;
 import java.sql.Connection;
 import java.sql.SQLException;
+import com.mycompany.clinicamedica.modelo.Sesion;
+import com.mycompany.clinicamedica.vista.PerfilMedicoVista;
 
 import javax.swing.*;
 
@@ -36,7 +38,7 @@ private void iniciarSesion() {
 
                 // Obtener SecretarioID y guardar en Sesion
                 int secretarioID = modelo.obtenerSecretarioID(usuario);
-                com.mycompany.clinicamedica.modelo.Sesion.iniciarSesion(usuario, secretarioID);
+                Sesion.iniciarSesionSecretario(usuario, secretarioID);
 
                 JOptionPane.showMessageDialog(vista, "Bienvenido, " + nombreCompleto);
                 vista.dispose();
@@ -46,18 +48,21 @@ private void iniciarSesion() {
                 new SecretarioControlador(secretarioVista);
 
             } else if ("Medico".equalsIgnoreCase(rol)) {
-                nombreCompleto = modelo.obtenerNombreCompletoMedico(usuario);
+              nombreCompleto = modelo.obtenerNombreCompletoMedico(usuario);
 
-                JOptionPane.showMessageDialog(vista, "Bienvenido, " + nombreCompleto);
+            // Obtener MedicoID y guardar en Sesion
+                int medicoID = modelo.obtenerMedicoID(usuario);
+                Sesion.iniciarSesionMedico(usuario, medicoID);
+
+                JOptionPane.showMessageDialog(vista, "Bienvenido Dr/a " + nombreCompleto);
                 vista.dispose();
 
-                MedicoVista medicoVista = new MedicoVista();
-                MedicoModelo medicoModelo = new MedicoModelo();
-                new MedicoControlador(medicoModelo, medicoVista);
-
-            } else {
-                JOptionPane.showMessageDialog(null, "Rol no soportado: " + rol);
+                PerfilMedicoVista perfilVista = new PerfilMedicoVista();
+                new PerfilMedicoControlador(perfilVista, medicoID);
             }
+                else {
+                JOptionPane.showMessageDialog(null, "Rol no soportado: " + rol);
+                     }
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error al conectar con la base de datos: " + e.getMessage());
@@ -67,6 +72,5 @@ private void iniciarSesion() {
         JOptionPane.showMessageDialog(vista, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
-
 
 }

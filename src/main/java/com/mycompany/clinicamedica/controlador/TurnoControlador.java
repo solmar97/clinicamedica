@@ -60,35 +60,36 @@ public class TurnoControlador {
         vista.habilitarBotonesTurnoSeleccionado(false);
     }
 
-    private void cargarTurnosTabla(List<Turno> turnos) {
-        this.listaTurnosActual = turnos;
-        var modeloTabla = vista.getModeloTabla();
-        modeloTabla.setRowCount(0);
+private void cargarTurnosTabla(List<Turno> turnos) {
+    this.listaTurnosActual = turnos;
+    var modeloTabla = vista.getModeloTabla();
+    modeloTabla.setRowCount(0);
 
-        for (Turno t : turnos) {
-            String fecha = t.getFechaProgramada().format(FORMATO_FECHA);
-            String hora = t.getHoraProgramada().toString();
+    for (Turno t : turnos) {
+        String fecha = t.getFechaProgramada().format(FORMATO_FECHA);
+        String hora = t.getHoraProgramada().toString();
 
-            modeloTabla.addRow(new Object[]{
-                fecha, hora,
-                String.valueOf(t.getDniPaciente()),
-                t.getNombrePaciente(),
-                t.getApellidoPaciente(),
-                t.getNombreMedico(),
-                t.getApellidoMedico(),
-                t.getEspecialidad() != null ? t.getEspecialidad() : ""
-            });
-        }
-
-        vista.limpiarDetalles();
-        vista.habilitarBotonesTurnoSeleccionado(false);
+        modeloTabla.addRow(new Object[]{
+            fecha, hora,
+            String.valueOf(t.getDniPaciente()),
+            t.getNombrePaciente(),
+            t.getApellidoPaciente(),
+            t.getNombreMedico(),
+            t.getApellidoMedico(),
+            t.getEspecialidad() != null ? t.getEspecialidad() : "",
+            t.isAtendido() ? "Atendido" : "Pendiente"  // Cambiado aquí
+        });
     }
+
+    vista.limpiarDetalles();
+    vista.habilitarBotonesTurnoSeleccionado(false);
+}
 
     private void aplicarFiltro() {
         String filtroDniStr = vista.getFiltroDniPaciente().trim();
         String filtroApellido = vista.getFiltroApellidoMedico().trim();
 
-        int dni = 0; 
+        int dni = 0;
 
         if (!filtroDniStr.isEmpty()) {
             try {
@@ -196,7 +197,7 @@ public class TurnoControlador {
             int medicoID = modelo.obtenerIdMedicoPorNombreCompleto(medicoSeleccionado);
             LocalDate fecha = LocalDate.parse(fechaStr, FORMATO_FECHA);
 
-           List<LocalTime> horasDisponibles = modelo.obtenerHorasDisponibles(medicoID, fecha);
+            List<LocalTime> horasDisponibles = modelo.obtenerHorasDisponibles(medicoID, fecha);
 
             detalleVista.cargarHoras(horasDisponibles);
 
@@ -205,79 +206,78 @@ public class TurnoControlador {
         }
     }
 
- private void abrirDetalleModificarTurno() {
-    int fila = vista.getTablaTurnos().getSelectedRow();
-    Turno turno = obtenerTurnoDesdeFila(fila);
-    if (turno != null) {
-        PacienteModelo pacienteModelo = new PacienteModelo(conexion);
+    private void abrirDetalleModificarTurno() {
+        int fila = vista.getTablaTurnos().getSelectedRow();
+        Turno turno = obtenerTurnoDesdeFila(fila);
+        if (turno != null) {
+            PacienteModelo pacienteModelo = new PacienteModelo(conexion);
 
-        DetalleTurnoVista detalleVista = new DetalleTurnoVista(turno, modelo, pacienteModelo);
+            DetalleTurnoVista detalleVista = new DetalleTurnoVista(turno, modelo, pacienteModelo);
 
-        List<String> medicos = modelo.listarMedicosPorEspecialidad(turno.getEspecialidad());
-        detalleVista.cargarMedicos(medicos);
+            List<String> medicos = modelo.listarMedicosPorEspecialidad(turno.getEspecialidad());
+            detalleVista.cargarMedicos(medicos);
 
-        String medicoCompleto = turno.getNombreMedico() + " " + turno.getApellidoMedico();
-        detalleVista.getComboMedicos().setSelectedItem(medicoCompleto);
+            String medicoCompleto = turno.getNombreMedico() + " " + turno.getApellidoMedico();
+            detalleVista.getComboMedicos().setSelectedItem(medicoCompleto);
 
-        detalleVista.getBtnGuardar().addActionListener(e -> {
-            try {
-                String fechaStr = detalleVista.getFecha();
-                String horaStr = detalleVista.getHora();
+            detalleVista.getBtnGuardar().addActionListener(e -> {
+                try {
+                    String fechaStr = detalleVista.getFecha();
+                    String horaStr = detalleVista.getHora();
 
-                LocalDate fecha = LocalDate.parse(fechaStr, FORMATO_FECHA);
-                LocalTime hora = LocalTime.parse(horaStr + ":00");
+                    LocalDate fecha = LocalDate.parse(fechaStr, FORMATO_FECHA);
+                    LocalTime hora = LocalTime.parse(horaStr + ":00");
 
-                String medicoSeleccionado = detalleVista.getMedicoSeleccionado();
-                if (medicoSeleccionado == null || medicoSeleccionado.isEmpty()) {
-                    JOptionPane.showMessageDialog(detalleVista, "Seleccioná un médico.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
+                    String medicoSeleccionado = detalleVista.getMedicoSeleccionado();
+                    if (medicoSeleccionado == null || medicoSeleccionado.isEmpty()) {
+                        JOptionPane.showMessageDialog(detalleVista, "Seleccioná un médico.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    String dniPacienteStr = detalleVista.getDniPaciente();
+                    if (dniPacienteStr == null || dniPacienteStr.isEmpty()) {
+                        JOptionPane.showMessageDialog(detalleVista, "Ingresá DNI del paciente.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    int dniPaciente = Integer.parseInt(dniPacienteStr);
+
+                    int pacienteID = modelo.obtenerPacienteIDPorDNI(dniPaciente);
+                    if (pacienteID == -1) {
+                        JOptionPane.showMessageDialog(detalleVista, "Paciente no encontrado con ese DNI.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    int idMedico = modelo.obtenerIdMedicoPorNombreCompleto(medicoSeleccionado);
+
+                    // Modificar el turno existente con los datos nuevos
+                    turno.setFechaProgramada(fecha);
+                    turno.setHoraProgramada(hora);
+                    turno.setMedicoID(idMedico);
+                    turno.setPacienteID(pacienteID);
+
+                    boolean actualizado = modelo.actualizarTurno(turno);
+                    if (actualizado) {
+                        JOptionPane.showMessageDialog(detalleVista, "Turno modificado correctamente.");
+                        detalleVista.dispose();
+                        aplicarFiltro();
+                    } else {
+                        JOptionPane.showMessageDialog(detalleVista, "Error al modificar turno.");
+                    }
+
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(detalleVista, "DNI inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(detalleVista, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
+            });
 
-                String dniPacienteStr = detalleVista.getDniPaciente();
-                if (dniPacienteStr == null || dniPacienteStr.isEmpty()) {
-                    JOptionPane.showMessageDialog(detalleVista, "Ingresá DNI del paciente.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                int dniPaciente = Integer.parseInt(dniPacienteStr);
+            detalleVista.getBtnCerrar().addActionListener(ev -> detalleVista.dispose());
 
-                int pacienteID = modelo.obtenerPacienteIDPorDNI(dniPaciente);
-                if (pacienteID == -1) {
-                    JOptionPane.showMessageDialog(detalleVista, "Paciente no encontrado con ese DNI.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                int idMedico = modelo.obtenerIdMedicoPorNombreCompleto(medicoSeleccionado);
-
-                // Modificar el turno existente con los datos nuevos
-                turno.setFechaProgramada(fecha);
-                turno.setHoraProgramada(hora);
-                turno.setMedicoID(idMedico);
-                turno.setPacienteID(pacienteID);
-
-                boolean actualizado = modelo.actualizarTurno(turno);
-                if (actualizado) {
-                    JOptionPane.showMessageDialog(detalleVista, "Turno modificado correctamente.");
-                    detalleVista.dispose();
-                    aplicarFiltro();
-                } else {
-                    JOptionPane.showMessageDialog(detalleVista, "Error al modificar turno.");
-                }
-
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(detalleVista, "DNI inválido.", "Error", JOptionPane.ERROR_MESSAGE);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(detalleVista, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        detalleVista.getBtnCerrar().addActionListener(ev -> detalleVista.dispose());
-
-        detalleVista.setVisible(true);
-    } else {
-        JOptionPane.showMessageDialog(vista, "Seleccioná un turno para ver los detalles.");
+            detalleVista.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(vista, "Seleccioná un turno para ver los detalles.");
+        }
     }
-}
-
 
     private void cancelarTurnoSeleccionado() {
         int fila = vista.getTablaTurnos().getSelectedRow();
@@ -299,10 +299,8 @@ public class TurnoControlador {
             }
         }
     }
-    
-  public List<LocalTime> obtenerHorasDisponiblesParaMedicoYFecha(int medicoId, LocalDate fecha) {
-    return modelo.obtenerHorasDisponibles(medicoId, fecha);  
-}
 
-
+    public List<LocalTime> obtenerHorasDisponiblesParaMedicoYFecha(int medicoId, LocalDate fecha) {
+        return modelo.obtenerHorasDisponibles(medicoId, fecha);
+    }
 }

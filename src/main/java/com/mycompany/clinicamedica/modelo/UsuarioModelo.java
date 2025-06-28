@@ -113,5 +113,20 @@ public int obtenerSecretarioID(String usuario) {
     return -1; // No encontrado
 }
 
+public int obtenerMedicoID(String usuario) {
+    String sql = "SELECT MedicoID FROM medico WHERE Usuario = ?";
+    try (Connection conn = ConexionBD.getConexion();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, usuario);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt("MedicoID");
+        }
+    } catch (SQLException e) {
+        System.out.println("Error al obtener MedicoID: " + e.getMessage());
+    }
+    return -1; // No encontrado
+}
+
 
 }

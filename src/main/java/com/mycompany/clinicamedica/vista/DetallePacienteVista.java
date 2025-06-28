@@ -1,5 +1,6 @@
 package com.mycompany.clinicamedica.vista;
 
+import com.mycompany.clinicamedica.modelo.Paciente;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -128,5 +129,44 @@ public LocalDate getFechaNacimientoComoLocalDate() {
     public void mostrarMensaje(String mensaje) {
       JOptionPane.showMessageDialog(this, mensaje);
     }
+    
+    public void mostrarSoloLectura(Paciente paciente) {
+    setDni(paciente.getDni());
+    setNombre(paciente.getNombre());
+    setApellido(paciente.getApellido());
+    
+    // Convertir LocalDate a String con formato dd/MM/yyyy
+    if (paciente.getFechaNacimiento() != null) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        setFechaNacimiento(paciente.getFechaNacimiento().format(formatter));
+    } else {
+        setFechaNacimiento("");
+    }
+
+    setTelefono(paciente.getTelefono());
+    setGenero(paciente.getGenero());
+    setEmail(paciente.getEmail());
+    setObraSocial(paciente.getObraSocial());
+    setNumeroAfiliado(paciente.getNumeroAfiliado());
+
+    // Dejar los campos no editables
+    txtDni.setEditable(false);
+    txtNombre.setEditable(false);
+    txtApellido.setEditable(false);
+    txtFechaNacimiento.setEditable(false);
+    txtTelefono.setEditable(false);
+    txtGenero.setEditable(false);
+    txtEmail.setEditable(false);
+    txtObraSocial.setEditable(false);
+    txtNumeroAfiliado.setEditable(false);
+
+    // Ocultar botones de acción, y cambiar texto del cancelar a "Cerrar"
+    btnGuardar.setVisible(false);
+    btnEliminar.setVisible(false);
+    btnCancelar.setText("Cerrar");
+
+    // Mostrar la ventana
+    setVisible(true);
+}
 
 }

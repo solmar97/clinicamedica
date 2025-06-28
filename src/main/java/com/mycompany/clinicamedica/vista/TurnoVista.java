@@ -4,9 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.util.List;
 import java.awt.event.ActionListener;
-import java.time.LocalDate;
 
 public class TurnoVista extends JFrame {
     private JTable tablaTurnos;
@@ -21,7 +19,7 @@ public class TurnoVista extends JFrame {
 
     public TurnoVista() {
         setTitle("Gestión de Turnos");
-        setSize(900, 500);
+        setSize(950, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -42,12 +40,13 @@ public class TurnoVista extends JFrame {
 
         add(panelFiltro, BorderLayout.NORTH);
 
-        // Tabla
+        // Tabla con columna "Estado del turno"
         String[] columnas = {
             "Fecha", "Hora", "DNI Paciente", "Nombre Paciente", "Apellido Paciente",
-            "Nombre Médico", "Apellido Médico", "Especialidad"
+            "Nombre Médico", "Apellido Médico", "Especialidad", "Estado del turno"
         };
         modeloTabla = new DefaultTableModel(columnas, 0) {
+            @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
@@ -115,6 +114,4 @@ public class TurnoVista extends JFrame {
         btnVerModificarTurno.setEnabled(habilitar);
         btnCancelarTurno.setEnabled(habilitar);
     }
-   
-
 }

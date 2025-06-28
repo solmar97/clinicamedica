@@ -45,57 +45,62 @@ public class TurnoModelo {
         return medicos;
     }
 
-    public List<Turno> listarTurnos() {
-        List<Turno> turnos = new ArrayList<>();
-        String sql = "SELECT t.TurnoID, t.PacienteID, t.MedicoID, t.SecretarioID, t.PagoID, t.FechaProgramada, t.HoraProgramada, " +
-                     "perPaciente.DNI AS PacienteDNI, perPaciente.Nombre AS PacienteNombre, perPaciente.Apellido AS PacienteApellido, " +
-                     "perPaciente.Telefono AS PacienteTelefono, p.ObraSocial, p.NumeroAfiliado, " +
-                     "perMedico.Nombre AS MedicoNombre, perMedico.Apellido AS MedicoApellido, e.Nombre AS MedicoEspecialidad " +
-                     "FROM Turno t " +
-                     "JOIN Paciente p ON t.PacienteID = p.PacienteID " +
-                     "JOIN Persona perPaciente ON p.DNI = perPaciente.DNI " +
-                     "JOIN Medico m ON t.MedicoID = m.MedicoID " +
-                     "JOIN Persona perMedico ON m.DNI = perMedico.DNI " +
-                     "LEFT JOIN MedicoEspecialidad me ON m.MedicoID = me.MedicoID " +
-                     "LEFT JOIN Especialidad e ON me.EspecialidadID = e.EspecialidadID " +
-                     "ORDER BY t.FechaProgramada, t.HoraProgramada";
+public List<Turno> listarTurnos() {
+    List<Turno> turnos = new ArrayList<>();
+    String sql = "SELECT t.TurnoID, t.PacienteID, t.MedicoID, t.SecretarioID, t.PagoID, t.FechaProgramada, t.HoraProgramada, " +
+                 "t.Atendido, " +
+                 "perPaciente.DNI AS PacienteDNI, perPaciente.Nombre AS PacienteNombre, perPaciente.Apellido AS PacienteApellido, " +
+                 "perPaciente.Telefono AS PacienteTelefono, p.ObraSocial, p.NumeroAfiliado, " +
+                 "perMedico.Nombre AS MedicoNombre, perMedico.Apellido AS MedicoApellido, e.Nombre AS MedicoEspecialidad " +
+                 "FROM Turno t " +
+                 "JOIN Paciente p ON t.PacienteID = p.PacienteID " +
+                 "JOIN Persona perPaciente ON p.DNI = perPaciente.DNI " +
+                 "JOIN Medico m ON t.MedicoID = m.MedicoID " +
+                 "JOIN Persona perMedico ON m.DNI = perMedico.DNI " +
+                 "LEFT JOIN MedicoEspecialidad me ON m.MedicoID = me.MedicoID " +
+                 "LEFT JOIN Especialidad e ON me.EspecialidadID = e.EspecialidadID " +
+                 "ORDER BY t.FechaProgramada, t.HoraProgramada";
 
-        try (PreparedStatement stmt = conexion.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+    try (PreparedStatement stmt = conexion.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                Turno t = new Turno();
-                t.setTurnoID(rs.getInt("TurnoID"));
-                t.setPacienteID(rs.getInt("PacienteID"));
-                t.setMedicoID(rs.getInt("MedicoID"));
-                t.setSecretarioID(rs.getInt("SecretarioID"));
-                int pagoId = rs.getInt("PagoID");
-                if (rs.wasNull()) {
-                    t.setPagoID(null);
-                } else {
-                    t.setPagoID(pagoId);
-                }
-                t.setFechaProgramada(rs.getDate("FechaProgramada").toLocalDate());
-                t.setHoraProgramada(rs.getTime("HoraProgramada").toLocalTime());
-
-                t.setDniPaciente(rs.getInt("PacienteDNI"));
-                t.setNombrePaciente(rs.getString("PacienteNombre"));
-                t.setApellidoPaciente(rs.getString("PacienteApellido"));
-                t.setTelefonoPaciente(rs.getString("PacienteTelefono"));
-                t.setObraSocialPaciente(rs.getString("ObraSocial"));
-                t.setNumeroAfiliadoPaciente(rs.getString("NumeroAfiliado"));
-
-                t.setNombreMedico(rs.getString("MedicoNombre"));
-                t.setApellidoMedico(rs.getString("MedicoApellido"));
-                t.setEspecialidad(rs.getString("MedicoEspecialidad"));
-
-                turnos.add(t);
+        while (rs.next()) {
+            Turno t = new Turno();
+            t.setTurnoID(rs.getInt("TurnoID"));
+            t.setPacienteID(rs.getInt("PacienteID"));
+            t.setMedicoID(rs.getInt("MedicoID"));
+            t.setSecretarioID(rs.getInt("SecretarioID"));
+            int pagoId = rs.getInt("PagoID");
+            if (rs.wasNull()) {
+                t.setPagoID(null);
+            } else {
+                t.setPagoID(pagoId);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            t.setFechaProgramada(rs.getDate("FechaProgramada").toLocalDate());
+            t.setHoraProgramada(rs.getTime("HoraProgramada").toLocalTime());
+
+            // Setear el estado atendido
+            t.setAtendido(rs.getBoolean("Atendido"));
+
+            t.setDniPaciente(rs.getInt("PacienteDNI"));
+            t.setNombrePaciente(rs.getString("PacienteNombre"));
+            t.setApellidoPaciente(rs.getString("PacienteApellido"));
+            t.setTelefonoPaciente(rs.getString("PacienteTelefono"));
+            t.setObraSocialPaciente(rs.getString("ObraSocial"));
+            t.setNumeroAfiliadoPaciente(rs.getString("NumeroAfiliado"));
+
+            t.setNombreMedico(rs.getString("MedicoNombre"));
+            t.setApellidoMedico(rs.getString("MedicoApellido"));
+            t.setEspecialidad(rs.getString("MedicoEspecialidad"));
+
+            turnos.add(t);
         }
-        return turnos;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return turnos;
+}
+
 
     public List<String> listarNombresMedicos() {
         List<String> medicos = new ArrayList<>();
@@ -411,6 +416,75 @@ private DayOfWeek mapearDiaEspañolADayOfWeek(String diaEsp) {
     }
 }
 
+public List<Turno> obtenerTurnosPagadosDelDiaPorMedico(int medicoID) {
+    List<Turno> turnos = new ArrayList<>();
+    String sql = "SELECT t.TurnoID, t.PacienteID, t.MedicoID, t.SecretarioID, t.PagoID, t.FechaProgramada, t.HoraProgramada, " +
+                 "t.Atendido, " +  // <-- agregá este campo en el SELECT
+                 "perPaciente.DNI AS PacienteDNI, perPaciente.Nombre AS PacienteNombre, perPaciente.Apellido AS PacienteApellido, " +
+                 "perPaciente.Telefono AS PacienteTelefono, p.ObraSocial, p.NumeroAfiliado, " +
+                 "perMedico.Nombre AS MedicoNombre, perMedico.Apellido AS MedicoApellido, e.Nombre AS MedicoEspecialidad " +
+                 "FROM Turno t " +
+                 "JOIN Paciente p ON t.PacienteID = p.PacienteID " +
+                 "JOIN Persona perPaciente ON p.DNI = perPaciente.DNI " +
+                 "JOIN Medico m ON t.MedicoID = m.MedicoID " +
+                 "JOIN Persona perMedico ON m.DNI = perMedico.DNI " +
+                 "LEFT JOIN MedicoEspecialidad me ON m.MedicoID = me.MedicoID " +
+                 "LEFT JOIN Especialidad e ON me.EspecialidadID = e.EspecialidadID " +
+                 "WHERE t.MedicoID = ? AND t.FechaProgramada = CURDATE() AND t.PagoID IS NOT NULL " +
+                 "ORDER BY t.HoraProgramada";
+
+    try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+        stmt.setInt(1, medicoID);
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Turno t = new Turno();
+                t.setTurnoID(rs.getInt("TurnoID"));
+                t.setPacienteID(rs.getInt("PacienteID"));
+                t.setMedicoID(rs.getInt("MedicoID"));
+                t.setSecretarioID(rs.getInt("SecretarioID"));
+                int pagoId = rs.getInt("PagoID");
+                if (rs.wasNull()) {
+                    t.setPagoID(null);
+                } else {
+                    t.setPagoID(pagoId);
+                }
+                t.setFechaProgramada(rs.getDate("FechaProgramada").toLocalDate());
+                t.setHoraProgramada(rs.getTime("HoraProgramada").toLocalTime());
+
+                t.setAtendido(rs.getBoolean("Atendido"));  // <<<<<<<<<<<<<<<<<<<<
+
+                t.setDniPaciente(rs.getInt("PacienteDNI"));
+                t.setNombrePaciente(rs.getString("PacienteNombre"));
+                t.setApellidoPaciente(rs.getString("PacienteApellido"));
+                t.setTelefonoPaciente(rs.getString("PacienteTelefono"));
+                t.setObraSocialPaciente(rs.getString("ObraSocial"));
+                t.setNumeroAfiliadoPaciente(rs.getString("NumeroAfiliado"));
+
+                t.setNombreMedico(rs.getString("MedicoNombre"));
+                t.setApellidoMedico(rs.getString("MedicoApellido"));
+                t.setEspecialidad(rs.getString("MedicoEspecialidad"));
+
+                turnos.add(t);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return turnos;
+}
+
+
+public boolean marcarTurnoComoAtendido(int turnoID) {
+    String sql = "UPDATE Turno SET Atendido = TRUE WHERE TurnoID = ?";
+    try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+        stmt.setInt(1, turnoID);
+        return stmt.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
 
     
 }

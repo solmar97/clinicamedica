@@ -130,4 +130,9 @@ public class Paciente {
     public void setNumeroAfiliado(String numeroAfiliado) {
         this.numeroAfiliado = numeroAfiliado;
     }
+    
+    public int getPacienteID() {
+    return id;
+}
+
 }

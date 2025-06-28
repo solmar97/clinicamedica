@@ -23,9 +23,12 @@ public class Turno {
     private String apellidoMedico;
     private String especialidad;
 
+    private boolean atendido;  // NUEVO CAMPO
+
     public Turno() {}
 
     // Getters y setters
+
     public int getTurnoID() {
         return turnoID;
     }
@@ -154,10 +157,15 @@ public class Turno {
         this.especialidad = especialidad;
     }
 
+    public boolean isAtendido() {
+        return atendido;
+    }
 
-   public String getNombreMedicoCompleto() {
-    return this.nombreMedico + " " + this.apellidoMedico;
-}
+    public void setAtendido(boolean atendido) {
+        this.atendido = atendido;
+    }
 
-
+    public String getNombreMedicoCompleto() {
+        return this.nombreMedico + " " + this.apellidoMedico;
+    }
 }

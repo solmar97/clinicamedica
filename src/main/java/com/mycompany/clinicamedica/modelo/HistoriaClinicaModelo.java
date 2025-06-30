@@ -27,39 +27,43 @@ public class HistoriaClinicaModelo {
         return fechas;
     }
 
-    public RegistroHistoriaClinica obtenerRegistroPorPacienteYFecha(int pacienteID, LocalDate fecha) {
-        String sql = """
-            SELECT hc.Descripcion, hc.MedicoID, hc.Atendido,
-                   p.Nombre AS NombreMedico, p.Apellido AS ApellidoMedico,
-                   e.Nombre AS Especialidad
-            FROM HistoriaClinica hc
-            JOIN Medico m ON hc.MedicoID = m.MedicoID
-            JOIN Persona p ON m.DNI = p.DNI
-            LEFT JOIN Especialidad e ON e.MedicoID = m.MedicoID
-            WHERE hc.PacienteID = ? AND hc.Fecha = ?
-            LIMIT 1
-        """;
+public RegistroHistoriaClinica obtenerRegistroPorPacienteMedicoYFecha(int pacienteID, int medicoID, LocalDate fecha) {
+    String sql = """
+        SELECT hc.Descripcion, hc.MedicoID, hc.Atendido,
+               p.Nombre AS NombreMedico, p.Apellido AS ApellidoMedico,
+               GROUP_CONCAT(e.Nombre SEPARATOR ', ') AS Especialidades
+        FROM HistoriaClinica hc
+        JOIN Medico m ON hc.MedicoID = m.MedicoID
+        JOIN Persona p ON m.DNI = p.DNI
+        LEFT JOIN MedicoEspecialidad me ON me.MedicoID = m.MedicoID
+        LEFT JOIN Especialidad e ON me.EspecialidadID = e.EspecialidadID
+        WHERE hc.PacienteID = ? AND hc.MedicoID = ? AND hc.Fecha = ?
+        GROUP BY hc.HistoriaClinicaID, hc.Descripcion, hc.MedicoID, hc.Atendido, p.Nombre, p.Apellido
+    """;
 
-        try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
-            stmt.setInt(1, pacienteID);
-            stmt.setDate(2, Date.valueOf(fecha));
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                RegistroHistoriaClinica registro = new RegistroHistoriaClinica();
-                registro.setFecha(fecha);
-                registro.setDescripcion(rs.getString("Descripcion"));
-                registro.setMedicoID(rs.getInt("MedicoID"));
-                registro.setNombreMedico(rs.getString("NombreMedico"));
-                registro.setApellidoMedico(rs.getString("ApellidoMedico"));
-                registro.setEspecialidad(rs.getString("Especialidad"));
-                registro.setAtendido(rs.getBoolean("Atendido"));
-                return registro;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+        stmt.setInt(1, pacienteID);
+        stmt.setInt(2, medicoID);
+        stmt.setDate(3, Date.valueOf(fecha));
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            RegistroHistoriaClinica registro = new RegistroHistoriaClinica();
+            registro.setFecha(fecha);
+            registro.setDescripcion(rs.getString("Descripcion"));
+            registro.setMedicoID(rs.getInt("MedicoID"));
+            registro.setNombreMedico(rs.getString("NombreMedico"));
+            registro.setApellidoMedico(rs.getString("ApellidoMedico"));
+            registro.setEspecialidad(rs.getString("Especialidades")); // Aquí vienen todas concatenadas
+            registro.setAtendido(rs.getBoolean("Atendido"));
+            return registro;
         }
-        return null;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return null;
+}
+
+
 
     public boolean guardarHistoria(int pacienteID, int medicoID, LocalDate fecha, String descripcion) {
         try {

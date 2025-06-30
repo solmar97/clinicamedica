@@ -50,7 +50,7 @@ public class HistoriaClinicaControlador {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             LocalDate fecha = LocalDate.parse(fechaStr, formatter);
 
-            RegistroHistoriaClinica registro = modelo.obtenerRegistroPorPacienteYFecha(pacienteID, fecha);
+             RegistroHistoriaClinica registro = modelo.obtenerRegistroPorPacienteMedicoYFecha(pacienteID, medicoID, fecha);
             if (registro == null) {
                 vista.getAreaDescripcion().setText("");
                 vista.getAreaDescripcion().setEditable(true);

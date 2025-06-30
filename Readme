@@ -7,7 +7,7 @@ https://github.com/solmar97/clinicamedica
 
 ### 2. Descargar la base de datos
 1. Dentro del repositorio, ir a la carpeta database/
-2. Descargar el archivo: Dump20250608.sql
+2. Descargar el archivo: Dump20250629.sql
 
 ### 3. Importar la base de datos en MySQL Workbench
 1. Abrir MySQL Workbench.
@@ -16,9 +16,7 @@ https://github.com/solmar97/clinicamedica
 - Puerto: 3306
 - Usuario: root
 - Contraseña: 1234
-
 3. Ir a File > Open SQL Script... y seleccionar el archivo Dump20250608.sql descargado.
-
 4. Crear la base de datos 
 CREATE DATABASE clinicamedica;
 USE clinicamedica;
@@ -26,24 +24,19 @@ USE clinicamedica;
 
 5. Ejecutar el script completo con el botón Run o presionar `Ctrl + Shift + Enter`.
 Esto creará todas las tablas necesarias y poblará la base de datos con la información requerida.
-
 6.  Hacer click en refresh al lado de Schemas 
-
-
 7. Abrir el proyecto en NetBeans
-
 1. Abrir NetBeans.
 2. Ir a `File > Open Project`.
 3. Seleccionar la carpeta del repositorio descargado.
 4. Una vez abierto, hacer clic en el botón verde Run Project (o presionar `F6`) para ejecutar la aplicación.
-
-### 5. Listo
-El sistema debería ejecutarse correctamente si los pasos fueron seguidos. Asegurate de tener corriendo tu servidor MySQL antes de ejecutar la aplicación.
-
+### 8. Listo
+El sistema debería ejecutarse correctamente si los pasos fueron seguidos. Asegúrese de tener corriendo su servidor MySQL antes de ejecutar la aplicación.
 ### SCOPE DEL PROYECTO
 Solamente está desarrollado los botones **Especialidad, Médico, Pacientes y Turnos**.
-
 ## Para acceder / iniciar sesión
+Para acceder con un rol de secretario:
 Usuario: pablo
 Contraseña: 1234
+En caso de querer acceder con un rol de médico, depende del día que esté probando el sistema, se debe buscar un médico que atienda el día específico, en detalles sacar el usuario y la contraseña e iniciar con esos datos para la pantalla del médico donde aparecen los turnos del día. 
 
